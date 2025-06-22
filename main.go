@@ -1,17 +1,26 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"belajar-golang-api/config"
+	"belajar-golang-api/routes"
 )
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello Jakarta!")
-}
-
 func main() {
-	http.HandleFunc("/hello", helloHandler)
+	// Initialize database
+	db := config.InitDB()
+	defer db.Close()
 
-	fmt.Println("Server running at http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	// Initialize router
+	r := mux.NewRouter()
+
+	// Setup routes
+	routes.SetupAuthRoutes(r)
+
+	// Start server
+	log.Println("Server running on port 8080")
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
